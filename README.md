@@ -11,3 +11,24 @@ Dentre os pacotes NuGet utilizados, o **AutoMapper** é responsável pelo mapeam
 - **Testes de Unidade:** Testes abrangentes com FluentAssertions para garantir a funcionalidade e a qualidade.
 - **Geração de Relatórios:** Capacidade de exportar relatórios detalhados para **PDF e Excel**, oferecendo uma análise visual e eficaz das despesas.
 - **RESTful API com Documentação Swagger:** Interface documentada que facilita a integração e o teste por parte dos desenvolvedores.
+
+## Getting Started
+
+Para obter uma cópia local funcionando, siga estes passos simples.
+
+### Requisitos
+
+* Visual Studio versão 2022+ ou Visual Studio Code
+* Windows 10+ ou Linux/MacOS com [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) instalado
+* MySql Server
+
+### Instalação
+
+1. Clone o repositório:
+    ```
+    git clone https://github.com/bs-matheus/CashFlow.git
+    ```
+
+2. Preencha a string de conexão com banco de dados no arquivo `appsettings.Development.json`
+
+3. Execute a API 🚀
