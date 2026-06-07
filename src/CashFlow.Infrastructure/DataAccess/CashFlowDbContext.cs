@@ -7,7 +7,7 @@ internal class CashFlowDbContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<Expense> Expenses { get; set; }
 
-    /*protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Expense>()
             .Property(e => e.Title)
@@ -20,5 +20,5 @@ internal class CashFlowDbContext(DbContextOptions options) : DbContext(options)
         modelBuilder.Entity<Expense>()
             .Property(e => e.Amount)
             .HasPrecision(10, 2);
-    }*/
+    }
 }
