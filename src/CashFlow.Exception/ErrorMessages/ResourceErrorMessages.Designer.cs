@@ -70,6 +70,24 @@ namespace CashFlow.Exception.ErrorMessages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The email cannot be empty..
+        /// </summary>
+        public static string EMAIL_CANNOT_BE_EMPTY {
+            get {
+                return ResourceManager.GetString("EMAIL_CANNOT_BE_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The email is invalid..
+        /// </summary>
+        public static string EMAIL_INVALID {
+            get {
+                return ResourceManager.GetString("EMAIL_INVALID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expense not found..
         /// </summary>
         public static string EXPENSE_NOT_FOUND {
@@ -84,6 +102,24 @@ namespace CashFlow.Exception.ErrorMessages {
         public static string EXPENSES_CANNOT_BE_FOR_FUTURE {
             get {
                 return ResourceManager.GetString("EXPENSES_CANNOT_BE_FOR_FUTURE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your password should be a minimum of 8 characters, containing at least one uppercase letter, one lowercase letter, one number, and one special character (e.g., !, ?, *, .).
+        /// </summary>
+        public static string INVALID_PASSWORD {
+            get {
+                return ResourceManager.GetString("INVALID_PASSWORD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The name cannot be empty..
+        /// </summary>
+        public static string NAME_CANNOT_BE_EMPTY {
+            get {
+                return ResourceManager.GetString("NAME_CANNOT_BE_EMPTY", resourceCulture);
             }
         }
         
