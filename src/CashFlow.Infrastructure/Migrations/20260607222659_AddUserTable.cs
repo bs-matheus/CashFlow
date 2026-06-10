@@ -20,7 +20,7 @@ namespace CashFlow.Infrastructure.Migrations
                 defaultValue: 0L);
 
             migrationBuilder.CreateTable(
-                name: "User",
+                name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -37,7 +37,7 @@ namespace CashFlow.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -47,10 +47,10 @@ namespace CashFlow.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Expenses_User_UserId",
+                name: "FK_Expenses_Users_UserId",
                 table: "Expenses",
                 column: "UserId",
-                principalTable: "User",
+                principalTable: "Users",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }
@@ -59,11 +59,11 @@ namespace CashFlow.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Expenses_User_UserId",
+                name: "FK_Expenses_Users_UserId",
                 table: "Expenses");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "Users");
 
             migrationBuilder.DropIndex(
                 name: "IX_Expenses_UserId",

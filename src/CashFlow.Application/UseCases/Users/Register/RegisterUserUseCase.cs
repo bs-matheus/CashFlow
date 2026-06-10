@@ -1,35 +1,48 @@
 ﻿using AutoMapper;
 using CashFlow.Communication.Requests;
 using CashFlow.Communication.Responses;
-using CashFlow.Domain.Repositories.User;
+using CashFlow.Domain.Entities;
+using CashFlow.Domain.Repositories;
+using CashFlow.Domain.Repositories.Users;
 using CashFlow.Domain.Security.Cryptography;
 using CashFlow.Exception.ErrorMessages;
 using CashFlow.Exception.ExceptionsBase;
 using FluentValidation.Results;
 
-namespace CashFlow.Application.UseCases.User.Register;
+namespace CashFlow.Application.UseCases.Users.Register;
 
 internal class RegisterUserUseCase : IRegisterUserUseCase
 {
     private readonly IMapper _mapper;
     private readonly IPasswordEncrypter _passwordEncrypter;
-    private readonly IUserReadOnlyRepository _repository;
+    private readonly IUsersReadOnlyRepository _readOnlyRepository;
+    private readonly IUsersWriteOnlyRepository _writeOnlyRepository;
+    private readonly IWorkUnit _workUnit;
 
     public RegisterUserUseCase(IMapper mapper,
                                IPasswordEncrypter passwordEncrypter,
-                               IUserReadOnlyRepository repository)
+                               IUsersReadOnlyRepository readOnlyRepository,
+                               IUsersWriteOnlyRepository writeOnlyRepository,
+                               IWorkUnit workUnit)
     {
         _mapper = mapper;
         _passwordEncrypter = passwordEncrypter;
-        _repository = repository;
+        _readOnlyRepository = readOnlyRepository;
+        _writeOnlyRepository = writeOnlyRepository;
+        _workUnit = workUnit;
     }
 
     public async Task<ResponseRegisteredUserJson> ExecuteAsync(RequestRegisterUserJson request)
     {
         await ValidateAsync(request);
 
-        var user = _mapper.Map<Domain.Entities.User>(request);
+        var user = _mapper.Map<User>(request);
         user.Password = _passwordEncrypter.Encrypt(request.Password);
+        user.UserIdentifier = Guid.NewGuid();
+
+        await _writeOnlyRepository.AddAsync(user);
+
+        await _workUnit.CommitAsync();
 
         return new ResponseRegisteredUserJson
         {
@@ -42,7 +55,7 @@ internal class RegisterUserUseCase : IRegisterUserUseCase
         var validator = new RegisterUserValidator();
         var result = validator.Validate(request);
 
-        bool emailExist = await _repository.ExistActiveUserWithEmailAsync(request.Email);
+        bool emailExist = await _readOnlyRepository.ExistActiveUserWithEmailAsync(request.Email);
         if (emailExist)
         {
             result.Errors.Add(new ValidationFailure(nameof(request.Email), ResourceErrorMessages.EMAIL_ALREADY_REGISTERED));
