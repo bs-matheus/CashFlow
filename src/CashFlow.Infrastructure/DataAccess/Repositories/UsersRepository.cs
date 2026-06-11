@@ -18,6 +18,12 @@ internal class UsersRepository : IUsersReadOnlyRepository, IUsersWriteOnlyReposi
     {
         return await _dbContext.Users.AsNoTracking().AnyAsync(user => user.Email.Equals(email));
     }
+
+    public async Task<User?> GetUserByEmailAsync(string email)
+    {
+        return await _dbContext.Users.AsNoTracking()
+                                     .FirstOrDefaultAsync(user => user.Email.Equals(email));
+    }
     #endregion
 
     #region WriteOnly
