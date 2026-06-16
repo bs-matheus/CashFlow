@@ -1,24 +1,31 @@
-﻿using CashFlow.Domain.Repositories.Users;
+﻿using CashFlow.Domain.Entities;
+using CashFlow.Domain.Repositories.Users;
 using Moq;
 
 namespace CommonTestUtilities.Repositories;
 
 public class UsersReadOnlyRepositoryBuilder
 {
-    private readonly Mock<IUsersReadOnlyRepository> _repository;
+    private readonly Mock<IUsersReadOnlyRepository> _mock;
 
     public UsersReadOnlyRepositoryBuilder()
     {
-        _repository = new Mock<IUsersReadOnlyRepository>();
+        _mock = new Mock<IUsersReadOnlyRepository>();
     }
 
     public void ExistActiveUserWithEmail(string existentEmail)
     {
-        _repository.Setup(x => x.ExistActiveUserWithEmailAsync(existentEmail)).ReturnsAsync(true);
+        _mock.Setup(repository => repository.ExistActiveUserWithEmailAsync(existentEmail)).ReturnsAsync(true);
+    }
+
+    public UsersReadOnlyRepositoryBuilder GetUserByEmail(User user)
+    {
+        _mock.Setup(repository => repository.GetUserByEmailAsync(user.Email)).ReturnsAsync(user);
+        return this;
     }
 
     public IUsersReadOnlyRepository Build()
     {
-        return _repository.Object;
+        return _mock.Object;
     }
 }

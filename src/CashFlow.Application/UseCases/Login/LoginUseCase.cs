@@ -7,7 +7,7 @@ using CashFlow.Exception.ExceptionsBase;
 
 namespace CashFlow.Application.UseCases.Login;
 
-internal class LoginUseCase : ILoginUseCase
+public class LoginUseCase : ILoginUseCase
 {
     private readonly IUsersReadOnlyRepository _repository;
     private readonly IPasswordEncrypter _passwordEncrypter;

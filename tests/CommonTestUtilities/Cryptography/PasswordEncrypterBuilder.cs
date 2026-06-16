@@ -3,15 +3,28 @@ using Moq;
 
 namespace CommonTestUtilities.Cryptography;
 
-public static class PasswordEncrypterBuilder
+public class PasswordEncrypterBuilder
 {
-    public static IPasswordEncrypter Build()
+    private readonly Mock<IPasswordEncrypter> _mock;
+
+    public PasswordEncrypterBuilder()
     {
-        var mock = new Mock<IPasswordEncrypter>();
+        _mock = new Mock<IPasswordEncrypter>();
 
-        mock.Setup(x => x.Encrypt(It.IsAny<string>()))
-            .Returns("&fefwe*22vhe");
+        _mock.Setup(encrypter => encrypter.Encrypt(It.IsAny<string>())).Returns("&fefwe*22vhe");
+    }
 
-        return mock.Object;
+    public PasswordEncrypterBuilder Verify(string? password)
+    {
+        if (!string.IsNullOrEmpty(password))
+        {
+            _mock.Setup(encrypter => encrypter.Verify(password, It.IsAny<string>())).Returns(true);
+        }
+        return this;
+    }
+
+    public IPasswordEncrypter Build()
+    {
+        return _mock.Object;
     }
 }
