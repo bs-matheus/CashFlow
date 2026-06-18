@@ -3,11 +3,11 @@ using CashFlow.Communication.Requests;
 using FluentValidation;
 using Shouldly;
 
-namespace Validators.Tests.Users;
+namespace Validators.Test.Users;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression")]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters")]
-public class PasswordValidatorTests
+public class PasswordValidatorTest
 {
     [Theory]
     [InlineData("")]

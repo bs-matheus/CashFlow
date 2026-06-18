@@ -9,9 +9,9 @@ using CommonTestUtilities.Requests;
 using CommonTestUtilities.Token;
 using Shouldly;
 
-namespace UseCases.Tests.Login;
+namespace UseCases.Test.Login;
 
-public class LoginUseCaseTests
+public class LoginUseCaseTest
 {
     [Fact]
     public async Task Success()

@@ -8,9 +8,9 @@ using CommonTestUtilities.Requests;
 using CommonTestUtilities.Token;
 using Shouldly;
 
-namespace UseCases.Tests.Users.Register;
+namespace UseCases.Test.Users.Register;
 
-public class RegisterUserUseCaseTests
+public class RegisterUserUseCaseTest
 {
     [Fact]
     public async Task Success()

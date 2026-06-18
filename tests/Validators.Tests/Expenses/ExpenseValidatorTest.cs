@@ -1,20 +1,21 @@
-﻿using CashFlow.Application.UseCases.Users.Register;
+﻿using CashFlow.Application.UseCases.Expenses;
+using CashFlow.Communication.Enums;
 using CashFlow.Exception.ErrorMessages;
 using CommonTestUtilities.Requests;
 using Shouldly;
 
-namespace Validators.Tests.Users.Register;
+namespace Validators.Test.Expenses;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression")]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "xUnit1012:Null should only be used for nullable parameters")]
-public class RegisterUserValidatorTests
+public class ExpenseValidatorTest
 {
     [Fact]
     public void Success()
     {
         //Arrange
-        var validator = new RegisterUserValidator();
-        var request = RequestRegisterUserJsonBuilder.Build();
+        var validator = new ExpenseValidator();
+        var request = RequestExpenseJsonBuilder.Build();
 
         //Act
         var result = validator.Validate(request);
@@ -27,12 +28,12 @@ public class RegisterUserValidatorTests
     [InlineData("")]
     [InlineData("  ")]
     [InlineData(null)]
-    public void Error_Name_Empty(string name)
+    public void Error_Title_Empty(string title)
     {
         //Arrange
-        var validator = new RegisterUserValidator();
-        var request = RequestRegisterUserJsonBuilder.Build();
-        request.Name = name;
+        var validator = new ExpenseValidator();
+        var request = RequestExpenseJsonBuilder.Build();
+        request.Title = title;
 
         //Act
         var result = validator.Validate(request);
@@ -41,19 +42,18 @@ public class RegisterUserValidatorTests
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldSatisfyAllConditions(
             c => c.ShouldHaveSingleItem(),
-            c => c.ShouldContain(error => error.ErrorMessage.Equals(ResourceErrorMessages.NAME_CANNOT_BE_EMPTY)));
+            c => c.ShouldContain(error => error.ErrorMessage.Equals(ResourceErrorMessages.TITLE_REQUIRED)));
     }
 
     [Theory]
-    [InlineData("")]
-    [InlineData("  ")]
-    [InlineData(null)]
-    public void Error_Email_Empty(string email)
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void Error_Amount_Invalid(decimal amount)
     {
         //Arrange
-        var validator = new RegisterUserValidator();
-        var request = RequestRegisterUserJsonBuilder.Build();
-        request.Email = email;
+        var validator = new ExpenseValidator();
+        var request = RequestExpenseJsonBuilder.Build();
+        request.Amount = amount;
 
         //Act
         var result = validator.Validate(request);
@@ -62,16 +62,16 @@ public class RegisterUserValidatorTests
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldSatisfyAllConditions(
             c => c.ShouldHaveSingleItem(),
-            c => c.ShouldContain(error => error.ErrorMessage.Equals(ResourceErrorMessages.EMAIL_CANNOT_BE_EMPTY)));
+            c => c.ShouldContain(error => error.ErrorMessage.Equals(ResourceErrorMessages.AMOUNT_MUST_BE_GREATER_THAN_ZERO)));
     }
 
     [Fact]
-    public void Error_Email_Invalid()
+    public void Error_Date_Future()
     {
         //Arrange
-        var validator = new RegisterUserValidator();
-        var request = RequestRegisterUserJsonBuilder.Build();
-        request.Email = "user.com";
+        var validator = new ExpenseValidator();
+        var request = RequestExpenseJsonBuilder.Build();
+        request.Date = DateTime.UtcNow.AddDays(1);
 
         //Act
         var result = validator.Validate(request);
@@ -80,16 +80,16 @@ public class RegisterUserValidatorTests
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldSatisfyAllConditions(
             c => c.ShouldHaveSingleItem(),
-            c => c.ShouldContain(error => error.ErrorMessage.Equals(ResourceErrorMessages.EMAIL_INVALID)));
+            c => c.ShouldContain(error => error.ErrorMessage.Equals(ResourceErrorMessages.EXPENSES_CANNOT_BE_FOR_FUTURE)));
     }
-    
+
     [Fact]
-    public void Error_Password_Empty()
+    public void Error_PaymentType_Invalid()
     {
         //Arrange
-        var validator = new RegisterUserValidator();
-        var request = RequestRegisterUserJsonBuilder.Build();
-        request.Password = string.Empty;
+        var validator = new ExpenseValidator();
+        var request = RequestExpenseJsonBuilder.Build();
+        request.PaymentType = (PaymentType)700;
 
         //Act
         var result = validator.Validate(request);
@@ -98,6 +98,6 @@ public class RegisterUserValidatorTests
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldSatisfyAllConditions(
             c => c.ShouldHaveSingleItem(),
-            c => c.ShouldContain(error => error.ErrorMessage.Equals(ResourceErrorMessages.INVALID_PASSWORD)));
+            c => c.ShouldContain(error => error.ErrorMessage.Equals(ResourceErrorMessages.PAYMENT_TYPE_INVALID)));
     }
 }
