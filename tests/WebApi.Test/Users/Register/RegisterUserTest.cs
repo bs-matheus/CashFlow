@@ -1,9 +1,12 @@
 ﻿using CashFlow.Exception.ErrorMessages;
 using CommonTestUtilities.Requests;
 using Shouldly;
+using System.Globalization;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using WebApi.Test.InlineData;
 
 namespace WebApi.Test.Users.Register;
 
@@ -34,11 +37,14 @@ public class RegisterUserTest : IClassFixture<CustomWebApplicationFactory>
         doc.RootElement.GetProperty("token").GetString().ShouldNotBeNullOrWhiteSpace();
     }
     
-    [Fact]
-    public async Task Error_Empty_Name()
+    [Theory]
+    [ClassData(typeof(CultureInlineDataTest))]
+    public async Task Error_Empty_Name(string languageCulture)
     {
         var request = RequestRegisterUserJsonBuilder.Build();
         request.Name = string.Empty;
+
+        _httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(languageCulture));
 
         var response = await _httpClient.PostAsJsonAsync(ROUTE, request);
 
@@ -49,8 +55,11 @@ public class RegisterUserTest : IClassFixture<CustomWebApplicationFactory>
         var doc = await JsonDocument.ParseAsync(responseBody);
 
         var errors = doc.RootElement.GetProperty("errorMessages").EnumerateArray();
+
+        var expectedMessage = ResourceErrorMessages.ResourceManager.GetString("NAME_CANNOT_BE_EMPTY", new CultureInfo(languageCulture));
+
         errors.ShouldSatisfyAllConditions(
             c => c.ShouldHaveSingleItem(),
-            c => c.ShouldContain(error => error.GetString()!.Equals(ResourceErrorMessages.NAME_CANNOT_BE_EMPTY)));
+            c => c.ShouldContain(error => error.GetString()!.Equals(expectedMessage)));
     }
 }
