@@ -4,5 +4,5 @@ namespace CashFlow.Domain.Services;
 
 public interface ILoggedUser
 {
-    Task<User?> GetAsync();
+    Task<User> GetAsync();
 }

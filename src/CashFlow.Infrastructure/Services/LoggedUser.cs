@@ -19,7 +19,7 @@ internal class LoggedUser : ILoggedUser
         _tokenProvider = tokenProvider;
     }
 
-    public async Task<User?> GetAsync()
+    public async Task<User> GetAsync()
     {
         string token = _tokenProvider.TokenOnRequest();
 
@@ -30,6 +30,6 @@ internal class LoggedUser : ILoggedUser
         var identifier = securityToken.Claims.First(claim => claim.Type == ClaimTypes.Sid).Value;
 
         return await _dbContext.Users.AsNoTracking()
-                                     .FirstOrDefaultAsync(user => user.UserIdentifier == Guid.Parse(identifier));
+                                     .FirstAsync(user => user.UserIdentifier == Guid.Parse(identifier));
     }
 }

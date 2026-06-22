@@ -32,7 +32,6 @@ internal class RegisterExpenseUseCase : IRegisterExpenseUseCase
         Validate(request);
 
         var user = await _loggedUser.GetAsync();
-        ArgumentNullException.ThrowIfNull(user);
 
         var entity = _mapper.Map<Expense>(request);
         entity.UserId = user.Id;

@@ -14,21 +14,27 @@ internal class ExpensesRepository : IExpensesWriteOnlyRepository, IExpensesReadO
     }
 
     #region WriteOnly
+
     public async Task AddAsync(Expense expense)
     {
         await _dbContext.Expenses.AddAsync(expense);
     }
+
     #endregion
 
     #region ReadOnly
-    public async Task<List<Expense>> GetAllAsync()
+
+    public async Task<List<Expense>> GetAllAsync(User loggedUser)
     {
-        return await _dbContext.Expenses.AsNoTracking().ToListAsync();
+        return await _dbContext.Expenses.AsNoTracking()
+                                        .Where(expense => expense.UserId == loggedUser.Id)
+                                        .ToListAsync();
     }
 
-    async Task<Expense?> IExpensesReadOnlyRepository.GetByIdAsync(long id)
+    async Task<Expense?> IExpensesReadOnlyRepository.GetByIdAsync(User loggedUser, long id)
     {
-        return await _dbContext.Expenses.AsNoTracking().FirstOrDefaultAsync(expense => expense.Id == id);
+        return await _dbContext.Expenses.AsNoTracking()
+                                        .FirstOrDefaultAsync(expense => expense.Id == id && expense.UserId == loggedUser.Id);
     }
 
     public async Task<List<Expense>> FilterByMonthAsync(DateOnly date)
@@ -43,23 +49,22 @@ internal class ExpensesRepository : IExpensesWriteOnlyRepository, IExpensesReadO
                                         .ThenBy(expense => expense.Title)
                                         .ToListAsync();
     }
+
     #endregion
 
     #region DeleteOnly
-    public async Task<bool> DeleteByIdAsync(long id)
+
+    public async Task DeleteByIdAsync(long id)
     {
-        var result = await _dbContext.Expenses.FirstOrDefaultAsync(expense => expense.Id == id);
+        var result = await _dbContext.Expenses.FindAsync(id);
 
-        if (result is null)
-            return false;
-
-        _dbContext.Expenses.Remove(result);
-
-        return true;
+        _dbContext.Expenses.Remove(result!);
     }
+
     #endregion
 
     #region UpdateOnly
+
     async Task<Expense?> IExpensesUpdateOnlyRepository.GetByIdAsync(User loggedUser, long id)
     {
         return await _dbContext.Expenses.FirstOrDefaultAsync(expense => expense.Id == id && expense.UserId == loggedUser.Id);
@@ -69,5 +74,6 @@ internal class ExpensesRepository : IExpensesWriteOnlyRepository, IExpensesReadO
     {
         _dbContext.Expenses.Update(expense);
     }
+
     #endregion
 }

@@ -30,10 +30,8 @@ internal class UpdateExpenseUseCase : IUpdateExpenseUseCase
     {
         Validate(request);
 
-        var loggedUser = await _loggedUser.GetAsync();
-        ArgumentNullException.ThrowIfNull(loggedUser);
-
-        var expense = await _repository.GetByIdAsync(loggedUser, id);
+        var user = await _loggedUser.GetAsync();
+        var expense = await _repository.GetByIdAsync(user, id);
 
         if (expense is null)
             throw new NotFoundException(ResourceErrorMessages.EXPENSE_NOT_FOUND);
