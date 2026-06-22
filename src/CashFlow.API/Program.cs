@@ -1,6 +1,8 @@
 using CashFlow.API.Filters;
 using CashFlow.API.Middleware;
+using CashFlow.API.Token;
 using CashFlow.Application;
+using CashFlow.Domain.Security.Tokens;
 using CashFlow.Infrastructure;
 using CashFlow.Infrastructure.Extensions;
 using CashFlow.Infrastructure.Migrations;
@@ -57,6 +59,9 @@ public class Program
 
         builder.Services.AddInfrastructure(builder.Configuration);
         builder.Services.AddApplication();
+
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<ITokenProvider, HttpContextTokenValue>();
 
         string signingKey = builder.Configuration.GetValue<string>("Settings:Jwt:SigningKey")!;
 

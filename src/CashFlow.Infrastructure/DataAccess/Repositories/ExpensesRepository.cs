@@ -60,9 +60,9 @@ internal class ExpensesRepository : IExpensesWriteOnlyRepository, IExpensesReadO
     #endregion
 
     #region UpdateOnly
-    async Task<Expense?> IExpensesUpdateOnlyRepository.GetByIdAsync(long id)
+    async Task<Expense?> IExpensesUpdateOnlyRepository.GetByIdAsync(User loggedUser, long id)
     {
-        return await _dbContext.Expenses.FirstOrDefaultAsync(expense => expense.Id == id);
+        return await _dbContext.Expenses.FirstOrDefaultAsync(expense => expense.Id == id && expense.UserId == loggedUser.Id);
     }
 
     public void Update(Expense expense)
