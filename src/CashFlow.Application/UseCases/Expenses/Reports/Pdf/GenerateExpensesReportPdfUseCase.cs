@@ -3,6 +3,7 @@ using CashFlow.Application.UseCases.Expenses.Reports.Pdf.Fonts;
 using CashFlow.Domain.Extensions;
 using CashFlow.Domain.Reports.Messages;
 using CashFlow.Domain.Repositories.Expenses;
+using CashFlow.Domain.Services;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;
 using MigraDoc.Rendering;
@@ -14,29 +15,31 @@ namespace CashFlow.Application.UseCases.Expenses.Reports.Pdf;
 internal class GenerateExpensesReportPdfUseCase : IGenerateExpensesReportPdfUseCase
 {
     private const string CURRENCY_SYMBOL = "R$";
-    private const string USER_NAME = "Matheus Barbosa";
-
     private const int EXPENSE_TABLE_ROW_HEIGHT = 25;
 
     private readonly IExpensesReadOnlyRepository _repository;
+    private readonly ILoggedUser _loggedUser;
 
-    public GenerateExpensesReportPdfUseCase(IExpensesReadOnlyRepository repository)
+    public GenerateExpensesReportPdfUseCase(IExpensesReadOnlyRepository repository, ILoggedUser loggedUser)
     {
         _repository = repository;
+        _loggedUser = loggedUser;
 
         GlobalFontSettings.FontResolver = new ExpensesReportFontResolver();
     }
 
     public async Task<byte[]> ExecuteAsync(DateOnly month)
     {
-        var expenses = await _repository.FilterByMonthAsync(month);
+        var user = await _loggedUser.GetAsync();
+
+        var expenses = await _repository.FilterByMonthAsync(user, month);
         if (expenses.Count == 0)
             return [];
 
-        var document = CreateDocument(month);
+        var document = CreateDocument(user.Name, month);
         var page = CreateSection(document);
 
-        CreateHeaderWithUserInformation(page);
+        CreateHeaderWithUserInformation(user.Name, page);
 
         decimal totalExpenses = expenses.Sum(expense => expense.Amount);
         CreateTotalSpentSection(page, month, totalExpenses);
@@ -74,11 +77,11 @@ internal class GenerateExpensesReportPdfUseCase : IGenerateExpensesReportPdfUseC
         return RenderDocument(document);
     }
 
-    private Document CreateDocument(DateOnly month)
+    private Document CreateDocument(string userName, DateOnly month)
     {
         var document = new Document();
         document.Info.Title = string.Format(ResourceReportGenerationMessages.EXPENSES_FOR, month.ToString("Y"));
-        document.Info.Author = USER_NAME;
+        document.Info.Author = userName;
 
         var style = document.Styles.Normal; // Default document paragraph style
         style.Font.Name = FontHelper.RALEWAY_REGULAR;
@@ -102,7 +105,7 @@ internal class GenerateExpensesReportPdfUseCase : IGenerateExpensesReportPdfUseC
         return section;
     }
 
-    private void CreateHeaderWithUserInformation(Section page)
+    private void CreateHeaderWithUserInformation(string userName, Section page)
     {
         var table = page.AddTable();
         table.AddColumn();
@@ -115,7 +118,7 @@ internal class GenerateExpensesReportPdfUseCase : IGenerateExpensesReportPdfUseC
         string filePath = Path.Combine(dirName, "Logo", "EmptyAvatar.png");
         row.Cells[0].AddImage(filePath);
 
-        row.Cells[1].AddParagraph(string.Format(ResourceReportGenerationMessages.USER_GREETING, USER_NAME));
+        row.Cells[1].AddParagraph(string.Format(ResourceReportGenerationMessages.USER_GREETING, userName));
         row.Cells[1].VerticalAlignment = VerticalAlignment.Center;
         row.Cells[1].Format.Font = new Font
         {
